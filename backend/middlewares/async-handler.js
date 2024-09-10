@@ -1,10 +1,10 @@
-import { json } from "body-parser"
+import json from "body-parser"
 
-const asyncHandler = async (fn) => {
+const asyncHandler = (fn) => (req, res, next) => {
     Promise.resolve(fn(req, res, next)).catch((error) => {
-        res.status(500), json({
+        res.status(403).json({
             errors: error.message || error
         })
     })
 }
-export default asyncHandler
+export default asyncHandler 
