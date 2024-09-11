@@ -11,11 +11,7 @@ import { logout } from "../../redux/features/auth/authSlice";
 import { toast } from "react-toastify";
 
 const Navigation = () => {
-	const navigate = useNavigate();
-	const dispatch = useDispatch();
 	const url = window.location.pathname;
-
-	const userInfo = useSelector((state) => state.auth.userInfo);
 
 	const [dropDownOpen, setDropOpen] = useState(false);
 

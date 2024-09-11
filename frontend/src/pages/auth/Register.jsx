@@ -1,8 +1,16 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { MdAppRegistration } from "react-icons/md";
+import { useDispatch, useSelector } from "react-redux";
+import { useLocation, useNavigate } from "react-router";
 import { toast } from "react-toastify";
+import { useRegisterMutation } from "../../redux/api/user";
+import { setCredentials } from "../../redux/features/auth/authSlice";
 
 const Register = () => {
+	//init
+	const navigate = useNavigate();
+	const dispatch = useDispatch();
+
 	//required field for registration
 	const [username, setUsername] = useState("");
 	const [name, setName] = useState("");
@@ -10,20 +18,40 @@ const Register = () => {
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
 
-	const [error, setError] = useState([]);
-
 	//redux
+	const userInfo = useSelector((state) => state.auth.userInfo);
+	const [register, { isLoading }] = useRegisterMutation();
 
-	function handleRegister(e) {
+	//others
+	const { search } = useLocation();
+	const sp = new URLSearchParams(search);
+	const redirect = sp.get("redirect") || "/movies";
+	const [errors, setErrors] = useState([]);
+
+	useEffect(() => {
+		if (userInfo) {
+			navigate(redirect);
+		}
+	}, [navigate, redirect, userInfo]);
+
+	async function handleRegister(e) {
 		e.preventDefault();
 
 		if (!username || !name || !email || !password || !confirmPassword) {
 			return toast.error("All fields are required");
 		} else if (password !== confirmPassword) {
-			return setError((error) => [...error, "passwords not match"]);
+			return setErrors((errors) => [...errors, "passwords not match"]);
 		} else {
-			setError([]);
-			toast.success("registered continue");
+			setErrors([]);
+			try {
+				const response = await register({
+					username,
+					email,
+					name,
+					password,
+				}).unwrap();
+				dispatch(setCredentials({ ...response }));
+			} catch (error) {}
 		}
 	}
 
@@ -77,7 +105,7 @@ const Register = () => {
 				<div className="form-control w-full max-w-xs">
 					<label className="label">
 						confirm password?
-						{error.find((err) => err == "passwords not match") && (
+						{errors.find((err) => err == "passwords not match") && (
 							<label className="badge bg-red-500">password not match</label>
 						)}
 					</label>
@@ -91,7 +119,11 @@ const Register = () => {
 					/>
 				</div>
 				<div className="py-5">
-					<button className="btn" type="submit">
+					<button
+						className={`btn ${isLoading && "loading"}`}
+						type="submit"
+						disabled={isLoading}
+					>
 						Register
 						<div className="badge">
 							<MdAppRegistration />
