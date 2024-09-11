@@ -1,10 +1,18 @@
 import React from "react";
+import { Outlet } from "react-router";
+import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+import Navigation from "./pages/auth/Navigation";
 
 const App = () => {
 	return (
-		<div className="underline bg-blue-200 shadow-orange-200 ">
-			<p className="p-5"> Testing... yes its working </p>
-		</div>
+		<>
+			<ToastContainer />
+			<Navigation />
+			<main>
+				<Outlet />
+			</main>
+		</>
 	);
 };
 
