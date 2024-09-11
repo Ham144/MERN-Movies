@@ -6,13 +6,13 @@ import Navigation from "./pages/auth/Navigation";
 
 const App = () => {
 	return (
-		<>
+		<div className={`font-sans w-full h-full mx-auto min-h-screen `}>
 			<ToastContainer />
-			<Navigation />
 			<main>
 				<Outlet />
 			</main>
-		</>
+			<Navigation />
+		</div>
 	);
 };
 

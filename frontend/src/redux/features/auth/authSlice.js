@@ -18,8 +18,8 @@ const authSlice = createSlice({
             localStorage.setItem("expired", expired)
         },
         logout(state) {
-            state.userInfo = null
-            localStorage.clear("userInfo")
+            state.userInfo = null;
+            localStorage.clear("userInfo");
         }
     },
 })

@@ -1,6 +1,6 @@
 
-import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query";
-import { USERS_URL } from "../constants";
+import { fetchBaseQuery } from "@reduxjs/toolkit/query";
+import { BASE_URL, USERS_URL } from "../constants";
 import { apiSlice } from "./apiSlice";
 
 const usersQuery = fetchBaseQuery({
@@ -8,15 +8,22 @@ const usersQuery = fetchBaseQuery({
 })
 
 export const userApiSlice = apiSlice.injectEndpoints({
-    endpoints: (builder) => {
+    endpoints: (builder) => ({
         login: builder.mutation({
             query: (data) => ({
-                url: "/login",
+                url: `${USERS_URL}/auth`,
+                method: "POST",
+                body: data
+            })
+        }),
+        register: builder.mutation({
+            query: (data) => ({
+                url: `${USERS_URL}`,
                 method: "POST",
                 body: data
             })
         })
-    }
+    })
 })
 
-export const { useLoginMutation } = userApiSlice;
+export const { useLoginMutation, useRegisterMutation } = userApiSlice;
