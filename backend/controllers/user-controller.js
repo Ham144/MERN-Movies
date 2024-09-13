@@ -7,7 +7,7 @@ const createUser = asyncHandler(async (req, res) => {
     const body = await req.body
     const { username, name, password, isAdmin, phone, email } = body
 
-    if (!username || !name || !password || !phone || !email) {
+    if (!username || !name || !password || !email) {
         throw new Error("Please add all obligation fields")
     }
     const userExist = await prisma.user.findUnique({
@@ -42,7 +42,7 @@ const createUser = asyncHandler(async (req, res) => {
         })
 
     } catch (error) {
-        res.status(500).send({ errors: error.message })
+        return res.status(400).send({ errors: error.message })
     }
 
 })
@@ -53,7 +53,7 @@ const loginUser = asyncHandler(async (req, res) => {
 
 
     if (!email || !password) {
-        res.status(400).json({ errors: "email and password required" })
+        return res.status(400).json({ errors: "email and password required" })
     }
 
     const userDB = await prisma.user.findUnique({
@@ -71,7 +71,7 @@ const loginUser = asyncHandler(async (req, res) => {
     })
 
     if (!userDB) {
-        res.status(404).json({ errors: "no user with this email" })
+        return res.status(404).json({ errors: "no user with this email" })
     }
 
     else {
@@ -95,7 +95,7 @@ const loginUser = asyncHandler(async (req, res) => {
                 data: user
             })
         } catch (error) {
-            res.status(401).json({ errors: error })
+            return res.status(401).json({ errors: error })
         }
     }
 

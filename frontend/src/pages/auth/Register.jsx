@@ -51,7 +51,11 @@ const Register = () => {
 					password,
 				}).unwrap();
 				dispatch(setCredentials({ ...response }));
-			} catch (error) {}
+				toast.success("Registered success");
+			} catch (error) {
+				toast.error(error?.data?.errors || error.message);
+				console.log(error?.data?.errors || error.message);
+			}
 		}
 	}
 

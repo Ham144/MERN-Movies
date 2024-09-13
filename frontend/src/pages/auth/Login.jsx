@@ -1,12 +1,41 @@
 import React, { useState } from "react";
 import { MdLogin } from "react-icons/md";
 import { toast } from "react-toastify";
+import { useLoginMutation } from "../../redux/api/user";
+import { useDispatch, useSelector } from "react-redux";
+import { setCredentials } from "../../redux/features/auth/authSlice";
+import { useNavigate } from "react-router";
 
 const Login = () => {
-	function handleLogin(e) {
-		e.preventDefault();
+	//required filed for login
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
 
-		toast.error("fix the fields usestate");
+	//redux
+	const dispatch = useDispatch();
+	const [login, { isLoading }] = useLoginMutation();
+	const userInfo = useSelector((state) => state.auth.userInfo);
+
+	//others
+	const navigate = useNavigate();
+
+	if (userInfo) return navigate("/movies");
+
+	async function handleLogin(e) {
+		e.preventDefault();
+		try {
+			const user = await login({
+				email,
+				password,
+			}).unwrap();
+
+			dispatch(setCredentials({ ...user }));
+			toast.success("Logged in success");
+			navigate("/movies");
+		} catch (error) {
+			toast.error(error?.data?.errors || error?.message);
+			console.log(error?.data?.errors || error?.message);
+		}
 	}
 
 	return (
@@ -19,6 +48,8 @@ const Login = () => {
 				<div className="form-control w-full max-w-xs">
 					<label className="label">email?</label>
 					<input
+						value={email}
+						onChange={(e) => setEmail(e.target.value)}
 						type="text"
 						placeholder="alextaylor@me.com"
 						className="input input-bordered w-full max-w-xs"
@@ -27,13 +58,15 @@ const Login = () => {
 				<div className="form-control w-full max-w-xs">
 					<label className="label">password?</label>
 					<input
+						value={password}
+						onChange={(e) => setPassword(e.target.value)}
 						type="password"
 						placeholder="password"
 						className="input input-bordered w-full max-w-xs"
 					/>
 				</div>
 				<div className="py-5">
-					<button className="btn" type="submit">
+					<button className={`btn ${isLoading && "loading"}`} type="submit">
 						Login
 						<div className="badge">
 							<MdLogin />
