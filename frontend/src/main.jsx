@@ -8,8 +8,9 @@ import App from "./App.jsx";
 import Home from "./pages/Home.jsx";
 import Login from "./pages/auth/Login.jsx";
 import Register from "./pages/auth/Register.jsx";
-import Logout from "./pages/auth/Logout.jsx";
 import Movies from "./pages/Movies.jsx";
+import PrivateRouteWrapper from "./pages/auth/PrivateRouteWrapper.jsx";
+import Profile from "./pages/auth/user/Profile.jsx";
 
 //Auth
 
@@ -22,7 +23,11 @@ const router = createBrowserRouter(
 			<Route path="/movies" element={<Movies />} />
 			<Route index path="/login" element={<Login />} />
 			<Route path="/register" element={<Register />} />
-			<Route path="/logout" element={<Logout />} />
+
+			<Route path="" element={<PrivateRouteWrapper />}>
+				//privates pages
+				<Route path="/profile" element={<Profile />} />
+			</Route>
 		</Route>
 	)
 );

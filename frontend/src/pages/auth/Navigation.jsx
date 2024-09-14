@@ -19,7 +19,7 @@ const Navigation = () => {
 
 	//redux
 	const userInfo = useSelector((state) => state.auth.userInfo);
-	const [logout] = useLogoutMutation();
+	const [logoutApicall] = useLogoutMutation();
 
 	function toggleDropDown() {
 		setDropOpen((prev) => (prev = !prev));
