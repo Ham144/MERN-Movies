@@ -1,9 +1,8 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Outlet } from "react-router";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import Navigation from "./pages/auth/Navigation";
-import { retry } from "@reduxjs/toolkit/query";
 import Menu from "./pages/Menu";
 
 const App = () => {

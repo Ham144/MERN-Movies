@@ -9,11 +9,11 @@ const router = express.Router();
 router.post("/", createUser).get(authenticate, authorizeIsAdmin, getAllUser)
 router.post("/auth", loginUser)
 router.delete("/logout", logoutUser)
-router.get("/", authenticate, authorizeIsAdmin, getAllUser)
-router.get("/:username", authenticate, getSingleUser)
+router.get("/", authenticate, authorizeIsAdmin, getAllUser) //belum digunakan
+router.get("/:username", authenticate, getSingleUser) //belum digunakan
 router.get("/current/user", authenticate, getCurrentUser)
 router.patch("/update/:username", authenticate, updateSingleUser)
-router.delete("/delete/:username", authenticate, deleteSingleUser)
+router.delete("/delete/:username", authenticate, deleteSingleUser) //belum digunakan
 
 
 export default router

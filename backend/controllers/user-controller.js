@@ -20,7 +20,7 @@ const createUser = asyncHandler(async (req, res) => {
             email: email
         }
     })
-    if (userExist) res.status(403).json({ errors: "username or email exist" })
+    if (userExist) return res.status(403).json({ errors: "username or email exist" })
 
     //hasing
     body.password = bcrypt.hashSync(password, 10)
@@ -37,7 +37,7 @@ const createUser = asyncHandler(async (req, res) => {
             }
         })
         generateToken(res, user.username)
-        res.status(200).json({
+        return res.status(200).json({
             data: user
         })
 
@@ -79,7 +79,7 @@ const loginUser = asyncHandler(async (req, res) => {
             const passwordCorrect = bcrypt.compareSync(password, userDB.password)
 
             if (!passwordCorrect) {
-                res.status(401).json({ errors: "email or password is wrong" })
+                return res.status(401).json({ errors: "email or password is wrong" })
             }
             generateToken(res, userDB.username)
 
@@ -91,7 +91,7 @@ const loginUser = asyncHandler(async (req, res) => {
                 phone: userDB.phone
             }
 
-            res.status(200).json({
+            return res.status(200).json({
                 data: user
             })
         } catch (error) {
@@ -112,9 +112,9 @@ const logoutUser = asyncHandler(async (req, res) => {
             httpOnly: true,
             expires: new Date(0)
         })
-        res.status(200).end()
+        return res.status(200).end()
     } catch (error) {
-        res.status(401).json({
+        return res.status(401).json({
             errors: error.message
         })
     }
@@ -124,7 +124,7 @@ const logoutUser = asyncHandler(async (req, res) => {
 const getAllUser = asyncHandler(async (req, res) => {
     const users = await prisma.user.findMany({})
     if (users.length == 0) {
-        res.status(404).json({ errors: "no user found" })
+        return res.status(404).json({ errors: "no user found" })
     }
 
     return res.status(202).json({ data: users })
@@ -146,9 +146,9 @@ const getSingleUser = asyncHandler(async (req, res) => {
                 phone: true
             }
         })
-        res.status(200).json({ data: user })
+        return res.status(200).json({ data: user })
     } catch (error) {
-        res.status(403).json({ errors: error.message })
+        return res.status(403).json({ errors: error.message })
     }
 })
 
@@ -156,9 +156,9 @@ const getCurrentUser = asyncHandler(async (req, res) => {
 
     try {
         if (req.user == undefined) throw new Error("problem found, no current user")
-        res.status(200).json({ data: req.user })
+        return res.status(200).json({ data: req.user })
     } catch (error) {
-        res.status(401).json({ errors: error.message })
+        return res.status(401).json({ errors: error.message })
     }
 })
 
@@ -171,7 +171,7 @@ const updateSingleUser = asyncHandler(async (req, res) => {
         errors: "username params required"
     })
     else if (!req.user.username) {
-        res.status(401).json({ errors: "not authenticated" })
+        return res.status(401).json({ errors: "not authenticated" })
     }
     else if (req.user.username != username) {
         if (req.user.isAdmin == "REGULER") {
@@ -220,9 +220,9 @@ const updateSingleUser = asyncHandler(async (req, res) => {
                 })
                 const warnUserName = username != req.body.username ? ("you cant change username becasue it is as a Foreign key") : null;
 
-                res.status(200).json({ warnUserName, data: newUserDB, message: "successfully change others profile" })
+                return (200).json({ warnUserName, data: newUserDB, message: "successfully change others profile" })
             } catch (error) {
-                res.status(400).json({ errors: error.message })
+                return res.status(400).json({ errors: error.message })
             }
         }
 
@@ -250,7 +250,7 @@ const updateSingleUser = asyncHandler(async (req, res) => {
             }
         })
         req.user = userDB
-        res.status(200).json({ data: req.user, message: "your own profile is up to date" })
+        return res.status(200).json({ data: req.user, message: "your own profile is up to date" })
     }
 
 })
@@ -261,7 +261,7 @@ const deleteSingleUser = asyncHandler(async (req, res) => {
     if (!username) return res.status(403).json({ errors: "username params required" })
 
     if (username == req.user.userna) {
-        res.status(403).json({ errors: "you cant delete your own account" })
+        return res.status(403).json({ errors: "you cant delete your own account" })
     }
 
     try {
@@ -273,9 +273,9 @@ const deleteSingleUser = asyncHandler(async (req, res) => {
 
         if (!user) return res.status(404).json({ errors: "user not found" })
 
-        res.status(204).json({ ok: true })
+        return res.status(204).json({ ok: true })
     } catch (error) {
-        res.status(401).json({ errors: error.message })
+        return res.status(401).json({ errors: error.message })
     }
 
 })

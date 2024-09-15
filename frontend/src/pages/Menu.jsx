@@ -19,8 +19,8 @@ const Menu = () => {
 						</Link>
 					</li>
 					<li>
-						<Link to={"/profile"} className="btn m-1">
-							Profile
+						<Link to={"/genre"} className="btn m-1">
+							Genre
 						</Link>
 					</li>
 				</ul>

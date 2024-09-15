@@ -11,6 +11,8 @@ import Register from "./pages/auth/Register.jsx";
 import Movies from "./pages/Movies.jsx";
 import PrivateRouteWrapper from "./pages/auth/PrivateRouteWrapper.jsx";
 import Profile from "./pages/auth/user/Profile.jsx";
+import AdminRouteWrapper from "./pages/admin/AdminRouteWrapper.jsx";
+import Genre from "./pages/admin/Genre.jsx";
 
 //Auth
 
@@ -25,8 +27,13 @@ const router = createBrowserRouter(
 			<Route path="/register" element={<Register />} />
 
 			<Route path="" element={<PrivateRouteWrapper />}>
-				//privates pages
+				//private pages
 				<Route path="/profile" element={<Profile />} />
+			</Route>
+
+			<Route path="" element={<AdminRouteWrapper />}>
+				//Only Admin pages
+				<Route path="/genre" element={<Genre />} />
 			</Route>
 		</Route>
 	)

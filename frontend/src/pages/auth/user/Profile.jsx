@@ -2,15 +2,15 @@ import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { toast } from "react-toastify";
-import { prisma } from "../../../../../backend/utils/database/prisma";
 import { useProfileMutation } from "../../../redux/api/user";
 import { MdUpdate } from "react-icons/md";
-import { retry } from "@reduxjs/toolkit/query";
+import { setCredentials } from "../../../redux/features/auth/authSlice";
+import bcrypt from "bcryptjs";
 
 const Profile = () => {
 	//redux
 	const userInfo = useSelector((state) => state.auth.userInfo);
-	const [profile, { isLoading }] = useProfileMutation();
+	const [updateProfile, { isLoading }] = useProfileMutation();
 	const dispatch = useDispatch();
 
 	//states for profile
@@ -23,12 +23,12 @@ const Profile = () => {
 	const [confirmPassword, setConfirmPassword] = useState("");
 
 	//others
-	const errors = {
+	const [errors, setErrors] = useState({
 		name: [],
 		email: [],
 		phone: [],
 		password: [],
-	};
+	});
 
 	function initializationState() {
 		setEmail(userInfo.data.email);
@@ -39,22 +39,51 @@ const Profile = () => {
 
 	async function handlePatchProfile(e) {
 		e.preventDefault();
+		setErrors({ name: [], email: [], phone: [], password: [] });
+		if (!username) toast.error("something wrong");
+		if (!name) setErrors((errors) => ({ ...errors, name: ["name required"] }));
+		if (!email)
+			setErrors((errors) => ({ ...errors, email: ["email required"] }));
 
-		if (!username) return toast.error("something wrong");
-		else if (!name) errors.email.push("email required");
-		else if (!email) errors.email.push("email required");
 		if (phone) {
-			if (typeof phone !== "number")
-				return errors.phone.push("phone should be number");
-			else if (phone.length < 5) return errors.phone.push("phone length min 5");
+			if (phone.split("").some((item) => isNaN(item)))
+				return setErrors((errors) => ({
+					...errors,
+					phone: ["phone must be number"],
+				}));
+			else if (phone.length <= 5)
+				return setErrors((errors) => ({
+					...errors,
+					phone: ["phone must be greater than 5"],
+				}));
 		}
+		if (password) {
+			if (password !== confirmPassword)
+				return setErrors((errors) => ({
+					...errors,
+					password: ["new password not match"],
+				}));
+		}
+		const hashedPassword = bcrypt.hashSync(password, 10);
 		try {
 			//patch profile
+			const result = await updateProfile({
+				username,
+				email,
+				name,
+				phone,
+				isAdmin,
+				password: hashedPassword,
+			}).unwrap();
+			dispatch(setCredentials({ ...result }));
+			toast.success(result.message);
 		} catch (error) {
 			toast.error(error?.data?.errors || error.message);
 			console.log(error?.data?.errors || error.message);
 		}
 	}
+
+	console.log(errors);
 
 	useEffect(() => {
 		initializationState();
@@ -133,7 +162,7 @@ const Profile = () => {
 				<input
 					value={password}
 					onChange={(e) => setPassword(e.target.value)}
-					type="text"
+					type="password"
 					placeholder="input new password"
 					className="input input-bordered w-full max-w-xs"
 				/>
@@ -148,12 +177,17 @@ const Profile = () => {
 				<input
 					value={confirmPassword}
 					onChange={(e) => setConfirmPassword(e.target.value)}
-					type="text"
+					type="password"
 					placeholder="type again password"
 					className="input input-bordered w-full max-w-xs"
 				/>
 			</div>
-			<select className="select select-bordered w-full max-w-xs mt-5">
+			<select
+				className={`select select-bordered w-full max-w-xs mt-5 ${
+					userInfo?.data?.isAdmin == "REGULER" && "animate-pulse"
+				}`}
+				onChange={(e) => setIsAdmin(e.target.value)}
+			>
 				<option
 					value="ADMIN"
 					selected={userInfo.data.isAdmin == "ADMIN" && true}
@@ -167,7 +201,10 @@ const Profile = () => {
 					REGULER
 				</option>
 			</select>
-			<button className="btn mt-5">
+			<button
+				className={`btn mt-5 ${isLoading && "loading"}`}
+				disabled={isLoading}
+			>
 				Update
 				<div className="badge">
 					<MdUpdate />

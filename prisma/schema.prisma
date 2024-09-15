@@ -28,3 +28,10 @@ enum Role {
   ADMIN
   REGULER
 }
+
+model Genre {
+  id   Int    @id @default(autoincrement())
+  name String @unique @db.VarChar(32)
+
+  @@map("genre")
+}

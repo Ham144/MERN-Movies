@@ -3,6 +3,7 @@ import 'dotenv/config'
 import cookieParser from "cookie-parser"
 import path from "path"
 import userRoute from "./routes/user-route.js"
+import genreRoute from "./routes/genre-route.js"
 
 const app = express()
 const PORT = process.env.PORT || 4004
@@ -22,6 +23,7 @@ app.listen(PORT, () => {
 
 //routes
 app.use("/api/users", userRoute)
+app.use("/api/genres", genreRoute)
 
 //exported for testing only
 export {
