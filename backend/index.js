@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser"
 import path from "path"
 import userRoute from "./routes/user-route.js"
 import genreRoute from "./routes/genre-route.js"
+import movieRoute from "./routes/movie-route.js"
 
 const app = express()
 const PORT = process.env.PORT || 4004
@@ -24,6 +25,7 @@ app.listen(PORT, () => {
 //routes
 app.use("/api/users", userRoute)
 app.use("/api/genres", genreRoute)
+app.use("/api/movies", movieRoute)
 
 //exported for testing only
 export {

@@ -14,12 +14,13 @@ datasource db {
 }
 
 model User {
-  username String  @id @db.VarChar(100)
-  name     String  @db.VarChar(100)
-  password String  @db.VarChar(100)
-  isAdmin  Role?   @default(REGULER)
-  email    String  @unique @db.VarChar(100)
-  phone    String? @db.VarChar(50)
+  username String    @id @db.VarChar(100)
+  name     String    @db.VarChar(100)
+  password String    @db.VarChar(100)
+  isAdmin  Role?     @default(REGULER)
+  email    String    @unique @db.VarChar(100)
+  phone    String?   @db.VarChar(50)
+  reviews  Reviews[]
 
   @@map("user")
 }
@@ -30,8 +31,34 @@ enum Role {
 }
 
 model Genre {
-  id   Int    @id @default(autoincrement())
-  name String @unique @db.VarChar(32)
+  id     Int     @id @default(autoincrement())
+  name   String  @unique @db.VarChar(32)
+  movies Movie[]
 
   @@map("genre")
+}
+
+model Movie {
+  id          Int       @id @default(autoincrement())
+  title       String    @unique @db.VarChar(50)
+  description String    @db.VarChar(200)
+  image       String    @db.VarChar(100)
+  genres      Genre[]
+  casts       String[]
+  year        Int
+  uploadAt    DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  reviews     Reviews[]
+}
+
+model Reviews {
+  id        Int      @id @default(autoincrement())
+  userName  String   @unique
+  user      User     @relation(fields: [userName], references: [username])
+  rating    Int?
+  comment   String   @db.VarChar(300)
+  movieId   Int?
+  movies    Movie?   @relation(fields: [movieId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }
