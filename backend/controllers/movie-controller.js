@@ -37,7 +37,7 @@ export const createMovie = async (req, res) => {
             }
         })
 
-        res.json({ data: result })
+        res.json({ data: "successfully create" })
 
     } catch (error) {
         return res.status(400).json({ errors: error.message })
@@ -64,7 +64,7 @@ export const deleteMovie = async (req, res) => {
                 id: +id
             }
         })
-        return res.json({ data: result })
+        return res.json({ data: "delete success" })
     } catch (error) {
         return res.status(400).json({ errors: error.message })
     }
@@ -106,7 +106,7 @@ export const editMovie = async (req, res) => {
         })
 
         if (!result) return res.status(403).json("failed to editMovie")
-        return res.json({ data: result })
+        return res.json({ data: "edit success" })
 
     } catch (error) {
         return res.status(400).json({ errors: error.message })
@@ -140,7 +140,6 @@ export const getSingleMovie = async (req, res) => {
     }
 }
 
-
 export const createReview = async (req, res) => {
     const body = req.body
     const { movieId } = req.params
@@ -167,37 +166,115 @@ export const createReview = async (req, res) => {
         return res.status(403).json({ errors: "rating should less then 5" })
     }
 
-
-    const user = await prisma.user.findUnique({
+    //prevent the same user multiple comment
+    const isReviewedByUser = await prisma.reviews.findUnique({
         where: {
-            username: currentUserName
+            movieId: +movieId,
+            userName: currentUserName
         }
     })
-
-    const movie = await prisma.movie.findUnique({
-        where: {
-            id: +movieId
-        }
-    })
-
-    if (!user || !movie) return res.status(404).json({ errors: "something wrong, not found" })
+    if (isReviewedByUser) return res.status(403).json({ errors: "this user have already reviewed this movie" })
 
     try {
 
-        const result = await prisma.reviews.create({
+        await prisma.reviews.create({
             data: {
                 comment,
                 rating: +rating,
                 user: {
-                    connect: user
+                    connect: {
+                        username: currentUserName
+                    }
                 },
                 movies: {
-                    connect: movie
+                    connect: {
+                        id: +movieId
+                    }
                 },
+            }
+        })
+        return res.status(200).json({ data: "deleted success!" })
+    } catch (error) {
+        return res.status(400).json({ errors: error.message })
+    }
+}
+
+
+export const deleteReview = async (req, res) => {
+    const { id, movieId } = req.params
+
+    if (!id || !movieId) return req.status(403).json({ errors: "id params required" })
+
+
+    try {
+        await prisma.reviews.delete({
+            where: {
+                id: +id,
+                movieId: +movieId
+            }
+        })
+
+        res.json({
+            data: "review deleted!",
+        })
+    } catch (error) {
+        return res.status(400).json({ errors: error.message })
+    }
+}
+
+export const latestMovies = async (req, res) => {
+    try {
+        const result = await prisma.movie.findMany({
+            orderBy: {
+                uploadAt: "desc"
+            }
+        })
+        return res.json({ data: result })
+    } catch (error) {
+        return eas.status(400).json({ errors: error.message })
+    }
+}
+
+export const hypeMovies = async (req, res) => {
+    try {
+        const result = await prisma.movie.findMany({
+            orderBy: {
+                reviews: {
+                    _count: "desc"
+                },
+            },
+            take: 6
+        })
+        return res.json({
+            data: result
+        })
+    } catch (error) {
+        return res.status(400).json({
+            errors: error.message
+        })
+    }
+}
+
+export const getRandomMovies = async (req, res) => {
+    let randomIds = []
+    await prisma.movie.findMany({
+        select: {
+            id: true
+        }
+    }).then((result) => result.sort((a, b) => 0.5 - Math.random())).then((result) => randomIds = result.slice(0, 6))
+
+
+
+    try {
+        const result = await prisma.movie.findMany({
+            where: {
+                id: {
+                    in: +[...randomIds]
+                }
             }
         })
         return res.status(200).json({ data: result })
     } catch (error) {
         return res.status(400).json({ errors: error.message })
     }
-}
+}  
