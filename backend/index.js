@@ -5,6 +5,7 @@ import path from "path"
 import userRoute from "./routes/user-route.js"
 import genreRoute from "./routes/genre-route.js"
 import movieRoute from "./routes/movie-route.js"
+import uploadRouter from "./routes/upload-route.js"
 
 const app = express()
 const PORT = process.env.PORT || 4004
@@ -26,6 +27,10 @@ app.listen(PORT, () => {
 app.use("/api/users", userRoute)
 app.use("/api/genres", genreRoute)
 app.use("/api/movies", movieRoute)
+app.use("/api/uploads", uploadRouter)
+
+const __dirname = path.resolve()
+app.use("/uploads", express.static(path.join(__dirname + "/uploads")))
 
 //exported for testing only
 export {

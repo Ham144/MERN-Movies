@@ -13,6 +13,7 @@ import PrivateRouteWrapper from "./pages/auth/PrivateRouteWrapper.jsx";
 import Profile from "./pages/auth/user/Profile.jsx";
 import AdminRouteWrapper from "./pages/admin/AdminRouteWrapper.jsx";
 import Genre from "./pages/admin/Genre.jsx";
+import Dashboard from "./pages/admin/Dashboard.jsx";
 
 //Auth
 
@@ -34,6 +35,7 @@ const router = createBrowserRouter(
 			<Route path="" element={<AdminRouteWrapper />}>
 				//Only Admin pages
 				<Route path="/genre" element={<Genre />} />
+				<Route path="/dashboard" element={<Dashboard />}></Route>
 			</Route>
 		</Route>
 	)

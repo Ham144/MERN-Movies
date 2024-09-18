@@ -12,13 +12,14 @@ router.get("/get/hypemovies", hypeMovies)
 router.get("/get/latest", latestMovies)
 
 //authenticated
-router.post("/:movieId/reviews", createReview) //review
+router.post("/:movieId/reviews", authenticate, createReview) //review
 
 //authorized admin
 router.post("/", authenticate, authorizeIsAdmin, createMovie)
 router.delete("/delete/:id", authenticate, authorizeIsAdmin, deleteMovie)
 router.put("/edit/:id", authenticate, authorizeIsAdmin, editMovie)
 router.delete("/:movieId/reviews/:id", authenticate, authorizeIsAdmin, deleteReview)
+
 
 
 export default router

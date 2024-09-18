@@ -256,22 +256,19 @@ export const hypeMovies = async (req, res) => {
 }
 
 export const getRandomMovies = async (req, res) => {
-    let randomIds = []
-    await prisma.movie.findMany({
+    const allIds = await prisma.movie.findMany({
         select: {
             id: true
         }
-    }).then((result) => result.sort((a, b) => 0.5 - Math.random())).then((result) => randomIds = result.slice(0, 6))
-
-
+    })
 
     try {
         const result = await prisma.movie.findMany({
-            where: {
-                id: {
-                    in: +[...randomIds]
-                }
-            }
+            orderBy: {
+                title: "asc"
+            },
+            skip: allIds.length / 2,
+            take: 6
         })
         return res.status(200).json({ data: result })
     } catch (error) {

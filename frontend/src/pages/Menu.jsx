@@ -23,6 +23,11 @@ const Menu = () => {
 							Genre
 						</Link>
 					</li>
+					<li>
+						<Link to={"/dashboard"} className="btn m-1">
+							Dashboard
+						</Link>
+					</li>
 				</ul>
 			</div>
 		</div>
