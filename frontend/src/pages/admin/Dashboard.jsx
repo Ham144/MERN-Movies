@@ -37,7 +37,58 @@ const Dashboard = () => {
 		);
 
 	function MyDashboard() {
-		return <div>my dashboard</div>;
+		return (
+			<div className={`flex flex-col gap-y-9`}>
+				<div className="flex max-md:flex-col  gap-3 justify-center">
+					<div className={`flex flex-col lg:w-1/2 w-full`}>
+						<button className="btn w-full">
+							<h2>Registered Users</h2>
+							<div className="badge badge-secondary">+99</div>
+						</button>
+						<div className="comment">//limited latest comment</div>
+						<button className="btn">
+							More
+							<MdArrowDropDown />
+						</button>
+					</div>
+					<div className={`flex flex-col lg:w-1/2 w-full`}>
+						<button className="btn w-full">
+							<h2>Latest Reviews</h2>
+							<div className="badge badge-secondary">+99</div>
+						</button>
+						<div className="comment">//</div>
+						<button className="btn">
+							More
+							<MdArrowDropDown />
+						</button>
+					</div>
+				</div>
+				<div className="flex  max-md:flex-col gap-3 justify-center">
+					<div className={`flex flex-col lg:w-1/2 w-full`}>
+						<button className="btn w-full">
+							<h2>Created Movies</h2>
+							<div className="badge badge-secondary">+99</div>
+						</button>
+						<div className="comment">//limited latest comment</div>
+						<button className="btn">
+							More
+							<MdArrowDropDown />
+						</button>
+					</div>
+					<div className={`flex flex-col lg:w-1/2 w-full`}>
+						<button className="btn w-full">
+							<h2>Latest comments</h2>
+							<div className="badge badge-secondary">+99</div>
+						</button>
+						<div className="comment">//</div>
+						<button className="btn">
+							More
+							<MdArrowDropDown />
+						</button>
+					</div>
+				</div>
+			</div>
+		);
 	}
 
 	function MoviesManager() {
@@ -129,7 +180,9 @@ const Dashboard = () => {
 					</ul>
 				</div>
 			</div>
-			<CurrentComponent />
+			<div className="flex flex-col gap-y-3">
+				<CurrentComponent />
+			</div>
 		</div>
 	);
 };
