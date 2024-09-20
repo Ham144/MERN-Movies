@@ -45,7 +45,7 @@ const Dashboard = () => {
 							<h2>Registered Users</h2>
 							<div className="badge badge-secondary">+99</div>
 						</button>
-						<div className="comment">//limited latest comment</div>
+						<div className="comment">{}</div>
 						<button className="btn">
 							More
 							<MdArrowDropDown />
