@@ -274,4 +274,16 @@ export const getRandomMovies = async (req, res) => {
     } catch (error) {
         return res.status(400).json({ errors: error.message })
     }
-}  
+
+}
+
+export const getAllReviews = async (req, res) => {
+    try {
+        const result = await prisma.reviews.findMany({
+        })
+        return res.status(200).json({ data: result })
+    } catch (error) {
+        return res.status(400).json({ errors: error.message })
+    }
+
+}

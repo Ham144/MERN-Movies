@@ -5,9 +5,12 @@ import {
 	useDeleteMovieMutation,
 	useDeleteReviewMutation,
 	useGetAllMoviesQuery,
+	useGetAllReviewsQuery,
 } from "../../redux/api/movie";
+import {data: allUsers, isLoading: isLoadingAllUsers} = 
 import { MdArrowDropDown } from "react-icons/md";
 import { Link } from "react-router-dom";
+import { AiFillStar } from "react-icons/ai";
 
 const Dashboard = () => {
 	//redux
@@ -19,6 +22,8 @@ const Dashboard = () => {
 		useDeleteMovieMutation();
 	const [deleteReview, { isLoading: isLoadingDeleteReview }] =
 		useDeleteReviewMutation();
+	const { data: allReviews, isLoading: isLoadingAllReviews } =
+		useGetAllReviewsQuery({});
 
 	//current dashboard component to show
 	const [currentCompoenent, setCurrentComponent] = useState("my-dashboard");
@@ -92,15 +97,105 @@ const Dashboard = () => {
 	}
 
 	function MoviesManager() {
-		return <div>movies manager</div>;
+		return (
+			<div>
+				{movies ? (
+					movies?.data?.map((movie) => (
+						<div className="card card-side bg-base-100 shadow-xl lg:mt-5 mt-3">
+							<div className={`button absolute flex w-full justify-between`}>
+								<button className="btn bg-red-400 px-3">Delete</button>
+								<button className="btn ">Edit</button>
+							</div>
+							<figure>
+								<img src={movie.image} alt="Movie" />
+							</figure>
+							<div className="card-body">
+								<h2 className="card-title">{movie.title}</h2>
+								<p>{movie.description}</p>
+								{/* //genres */}
+								<span className={`flex gap-x-3`}>
+									{movie.genres?.map((genre) => (
+										<div className="badge badge-primary">{genre.name}</div>
+									))}
+								</span>
+								{/* //casts */}
+								<span className="flex gap-x-3">
+									{movie.casts?.map((cast) => (
+										<div className="badge badge-primary">{cast}</div>
+									))}
+								</span>
+								<div className="card-actions justify-end">
+									<button className="btn btn-primary">Watch</button>
+								</div>
+								<div className="meta-data lg:pt-9 pt-4 text-white">
+									<span className={`badge`}>{movie.year}</span>
+									<span className={`badge`}>upload: {movie.uploadAt}</span>
+									<span className={`badge`}>
+										latest updated: {movie.updatedAt}
+									</span>
+									<span className={`badge`}>
+										Revies count: {movie?.reviews?.length || 0}
+									</span>
+								</div>
+							</div>
+						</div>
+					))
+				) : (
+					<span className="loading loading-spinner loading-lg"></span>
+				)}
+			</div>
+		);
 	}
 
 	function UsersManager() {
-		return <div>users manager</div>;
+        return <div className={`flex flex-col justify-center`}>{
+            
+        }</div>;
 	}
 
 	function ReviewsManager() {
-		return <div>reviews manager</div>;
+		return (
+			<div>
+				{allReviews ? (
+					allReviews?.data?.map((review) => (
+						<div className="card w-96 bg-primary lg:mt-4 mt-2 text-primary-content ">
+							<div className="card-body">
+								<h2 className="card-title badge align-middle p-3">
+									{review.userName}
+								</h2>
+								<h3 className="font-bold">
+									commented on :{" "}
+									{
+										movies.data.find((movie) => movie.id === review.movieId)
+											?.title
+									}
+								</h3>
+								<p>{review.comment}</p>
+								<span className="flex gap-x-2 items-center">
+									{Array.from({ length: review.rating }, (_, i) => (
+										<AiFillStar key={i} className="text-warning" />
+									))}{" "}
+									stars
+								</span>
+								<div className="flex justify-between items-center">
+									<div className="card-actions justify-end">
+										<button className="btn bg-red-400">Delete</button>
+									</div>
+									<div className={``}>
+										<span className={`badge-accent rounded-md px-4 mr-4`}>
+											Created At:{" "}
+										</span>
+										<span>{review.createdAt.slice(0, 10)}</span>
+									</div>
+								</div>
+							</div>
+						</div>
+					))
+				) : (
+					<span className="loading loading-ring loading-lg"></span>
+				)}
+			</div>
+		);
 	}
 
 	function CurrentComponent() {
@@ -180,7 +275,7 @@ const Dashboard = () => {
 					</ul>
 				</div>
 			</div>
-			<div className="flex flex-col gap-y-3">
+			<div className="flex flex-col gap-y-3 mx-auto">
 				<CurrentComponent />
 			</div>
 		</div>

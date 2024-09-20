@@ -63,8 +63,13 @@ export const movieApislice = apiSlice.injectEndpoints({
                 url: `${MOVIES_URL}/${movieId}/reviews/${id}`,
                 method: "DELETE",
             })
-        })
+        }),
+        getAllReviews: builder.query({
+            query: ({ movieId }) => ({
+                url: `${MOVIES_URL}/get/reviews`
+            })
+        }),
     })
 })
 
-export const { useGetAllMoviesQuery, useGetSingleMovieQuery, useGetRandomMoviesQuery, useGetHypeMoviesQuery, useCreateMovieMutation, useDeleteMovieMutation, useGetLatestMoviesQuery, useEditMovieMutation, useCreateReviewMutation, useDeleteReviewMutation } = movieApislice
+export const { useGetAllMoviesQuery, useGetSingleMovieQuery, useGetRandomMoviesQuery, useGetHypeMoviesQuery, useCreateMovieMutation, useDeleteMovieMutation, useGetLatestMoviesQuery, useEditMovieMutation, useCreateReviewMutation, useDeleteReviewMutation, useGetAllReviewsQuery } = movieApislice
