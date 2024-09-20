@@ -7,7 +7,7 @@ import {
 	useGetAllMoviesQuery,
 	useGetAllReviewsQuery,
 } from "../../redux/api/movie";
-import {data: allUsers, isLoading: isLoadingAllUsers} = 
+// import {data: allUsers, isLoading: isLoadingAllUsers} = useget
 import { MdArrowDropDown } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { AiFillStar } from "react-icons/ai";
@@ -148,9 +148,7 @@ const Dashboard = () => {
 	}
 
 	function UsersManager() {
-        return <div className={`flex flex-col justify-center`}>{
-            
-        }</div>;
+		return <div className={`flex flex-col justify-center`}>{}</div>;
 	}
 
 	function ReviewsManager() {
