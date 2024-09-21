@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useLayoutEffect, useState } from "react";
 import {
 	useCreateMovieMutation,
 	useEditMovieMutation,
@@ -11,6 +11,9 @@ import {
 import { MdArrowDropDown } from "react-icons/md";
 import { Link } from "react-router-dom";
 import { AiFillStar } from "react-icons/ai";
+import { useGetAllUsersQuery } from "../../redux/api/user";
+import { toast } from "react-toastify";
+import { useGetAllGenreQuery } from "../../redux/api/genre";
 
 const Dashboard = () => {
 	//redux
@@ -24,9 +27,22 @@ const Dashboard = () => {
 		useDeleteReviewMutation();
 	const { data: allReviews, isLoading: isLoadingAllReviews } =
 		useGetAllReviewsQuery({});
-
+	const { data: allUsers, isLoading: isLoadingAllUsers } = useGetAllUsersQuery(
+		{}
+	);
+	const { data: allGenres } = useGetAllGenreQuery();
 	//current dashboard component to show
-	const [currentCompoenent, setCurrentComponent] = useState("my-dashboard");
+	const [currentCompoenent, setCurrentComponent] = useState("movies-manager"); //default: my-dashboard
+
+	//states for movies
+	const [newMovies, setNewMovies] = useState({
+		title: "",
+		description: "",
+		genres: [],
+		image: "",
+		casts: [],
+		year: "",
+	});
 
 	if (
 		isLoadingMovies ||
@@ -41,11 +57,37 @@ const Dashboard = () => {
 			</div>
 		);
 
+	function handleOnChangeNewMovie(e) {
+		e.preventDefault();
+		const { name, value } = e.target;
+		if (name == "genres" || name == "casts") {
+			setNewMovies((prev) => ({
+				...prev,
+				[name]: value.split(","),
+			}));
+		}
+		setNewMovies((prev) => ({ ...prev, [name]: value }));
+	}
+
+	function handleCreateNewMovie(e) {
+		e.preventDefault();
+		console.log(newMovies);
+		// createMovie(newMovies);
+		setNewMovies({
+			title: "",
+			description: "",
+			genres: [],
+			image: "",
+			casts: [],
+			year: "",
+		});
+	}
+
 	function MyDashboard() {
 		return (
-			<div className={`flex flex-col gap-y-9`}>
-				<div className="flex max-md:flex-col  gap-3 justify-center">
-					<div className={`flex flex-col lg:w-1/2 w-full`}>
+			<div className={`flex flex-col gap-y-9 `}>
+				<div className="flex max-md:flex-col  gap-3 justify-center ">
+					<div className={`flex flex-col lg:w-1/2 w-full `}>
 						<button className="btn w-full">
 							<h2>Registered Users</h2>
 							<div className="badge badge-secondary">+99</div>
@@ -98,7 +140,23 @@ const Dashboard = () => {
 
 	function MoviesManager() {
 		return (
-			<div>
+			<div className={` flex-col gap-y-4`}>
+				<form
+					onSubmit={handleCreateNewMovie}
+					className={`w-96 mx-auto  justify-center mt-5 p-3 border rounded-md glass`}
+				>
+					<label className="w-full ">
+						Title
+						<input
+							value={newMovies.title}
+							onChange={handleOnChangeNewMovie}
+							name="title"
+							type="text"
+							placeholder=""
+							className="input  input-bordered w-full max-w-xs "
+						/>
+					</label>
+				</form>
 				{movies ? (
 					movies?.data?.map((movie) => (
 						<div className="card card-side bg-base-100 shadow-xl lg:mt-5 mt-3">
@@ -148,7 +206,38 @@ const Dashboard = () => {
 	}
 
 	function UsersManager() {
-		return <div className={`flex flex-col justify-center`}>{}</div>;
+		return (
+			<div className={`flex flex-col justify-center  max-md:w-full `}>
+				{!isLoadingAllUsers ? (
+					allUsers.data.map((user) => (
+						<div className="card w-96 bg-base-100 shadow-xl ">
+							<div className="card-body font-bold font-serif relative">
+								<h2 className="card-title items-center">
+									{user.username} ~ <span className="badge">{user.name}</span>
+								</h2>
+
+								<p>Email: {user.email}</p>
+								<p>Role: {user?.isAdmin}</p>
+								<div className={`absolute left-3 bottom-3`}></div>
+								<div className="card-actions justify-between mt-4 items-center ">
+									<div>
+										{user.admin ? (
+											<p className="text-red-500">Admin</p>
+										) : (
+											<p className="text-green-500">User</p>
+										)}
+									</div>
+									<button className="btn btn-primary">Edit</button>
+									<button className="btn bg-red-400">Delete</button>
+								</div>
+							</div>
+						</div>
+					))
+				) : (
+					<span className="loading loading-spinner loading-lg"></span>
+				)}
+			</div>
+		);
 	}
 
 	function ReviewsManager() {
@@ -216,16 +305,16 @@ const Dashboard = () => {
 	}
 
 	return (
-		<div className="flex flex-col">
-			<div className="drawer ">
+		<div className="flex flex-col  ">
+			<div className="drawer z-20 ">
 				<input
 					id="my-drawer"
 					type="checkbox"
 					value={true}
 					className="drawer-toggle"
 				/>
-				<div className="drawer-content ">
-					<label htmlFor="my-drawer" className="text-start glass  w-full btn ">
+				<div className="drawer-content w-full ">
+					<label htmlFor="my-drawer" className="btn w-full text-start glass  ">
 						Dashboard
 						<MdArrowDropDown size={30} />
 					</label>
@@ -273,7 +362,7 @@ const Dashboard = () => {
 					</ul>
 				</div>
 			</div>
-			<div className="flex flex-col gap-y-3 mx-auto">
+			<div className="block gap-y-3   ">
 				<CurrentComponent />
 			</div>
 		</div>
