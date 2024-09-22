@@ -24,10 +24,10 @@ const MoviesManager = React.memo(() => {
 	const [imagePreviewUrl, setImagePreviewUrl] = useState();
 	const [selectedImage, setSelectedImage] = useState();
 
-	function handleCreateNewMovie(e) {
+	async function handleCreateNewMovie(e) {
 		e.preventDefault();
 		console.log(newMovies);
-		// createMovie(newMovies);
+		// await createMovie(newMovies);
 		// setNewMovies({
 		// 	title: "",
 		// 	description: "",
@@ -43,10 +43,7 @@ const MoviesManager = React.memo(() => {
 		const { name, value } = e.target;
 
 		if (name == "casts") {
-			setNewMovies((prev) => ({
-				...prev,
-				casts: value.split(","),
-			}));
+			newMovies.genres.push(value);
 		}
 
 		if (name == "year" && isNaN(value)) {
@@ -56,11 +53,19 @@ const MoviesManager = React.memo(() => {
 				year: null,
 			}));
 		}
-		if (name == "genres") {
-			setNewMovies((prev) => ({
-				...prev,
-				[name]: value,
-			}));
+		if (name === "genres") {
+			if (e.target.checked) {
+				setNewMovies((prev) => ({
+					...prev,
+					genres: [...prev.genres, +value],
+				}));
+			} else {
+				setNewMovies((prev) => ({
+					...prev,
+					genres: prev.genres.filter((genre) => genre !== +value),
+				}));
+			}
+			return;
 		}
 
 		if (name == "image") {
@@ -130,16 +135,19 @@ const MoviesManager = React.memo(() => {
 				<label className="w-full text-start block">
 					<p>Genres</p>
 
-					<div className={`flex mx-auto gap-x-6 justify-start`}>
+					<div className={`flex mx-auto gap-x-2 justify-start`}>
 						{allGenres &&
 							allGenres.data.map((genre) => (
-								<input
-									type="checkbox"
-									name="genres"
-									value={genre.id}
-									onChange={handleChangeNewMovie}
-									className="checkbox"
-								/>
+								<>
+									<input
+										type="checkbox"
+										name="genres"
+										value={genre.id}
+										onChange={handleChangeNewMovie}
+										className="checkbox"
+									/>
+									<p>{genre.name}</p>
+								</>
 							))}
 					</div>
 				</label>
