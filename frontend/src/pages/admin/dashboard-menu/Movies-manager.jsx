@@ -7,7 +7,11 @@ import {
 import { useGetAllGenreQuery } from "../../../redux/api/genre";
 const MoviesManager = React.memo(() => {
 	//redux
-	const { data: movies, isLoading: isLoadingMovies } = useGetAllMoviesQuery();
+	const {
+		data: movies,
+		isLoading: isLoadingMovies,
+		refetch,
+	} = useGetAllMoviesQuery();
 	const { data: allGenres } = useGetAllGenreQuery();
 	const [createMovie, { isLoading: isLoadingCreateMovie }] =
 		useCreateMovieMutation();
@@ -19,15 +23,40 @@ const MoviesManager = React.memo(() => {
 		genres: [],
 		image: undefined,
 		casts: [],
-		year: "",
+		year: undefined,
 	});
 	const [imagePreviewUrl, setImagePreviewUrl] = useState();
 	const [selectedImage, setSelectedImage] = useState();
 
+	//others
+	const readerImage = new FileReader();
+
 	async function handleCreateNewMovie(e) {
 		e.preventDefault();
-		console.log(newMovies);
-		// await createMovie(newMovies);
+
+		if (typeof newMovies.casts != "object") {
+			if (newMovies.casts.includes(",")) {
+				newMovies.casts = newMovies.casts.split(",");
+			} else {
+				newMovies.casts = [newMovies.casts];
+			}
+		}
+
+		console.log(selectedImage);
+		const formImage = new FormData();
+		formImage.append("image", selectedImage);
+
+		try {
+			newMovies.image = formImage;
+			const result = await createMovie(newMovies).unwrap();
+			console.log(result);
+			toast.success("movie created successfully");
+			refetch();
+		} catch (error) {
+			console.log(error);
+			return toast.error(error.data.errors);
+		}
+
 		// setNewMovies({
 		// 	title: "",
 		// 	description: "",
@@ -42,16 +71,21 @@ const MoviesManager = React.memo(() => {
 		e.preventDefault();
 		const { name, value } = e.target;
 
-		if (name == "casts") {
-			newMovies.genres.push(value);
-		}
-
-		if (name == "year" && isNaN(value)) {
-			toast.error("year should be number");
-			setNewMovies((prev) => ({
-				...prev,
-				year: null,
-			}));
+		if (name == "year") {
+			const intValue = 2000;
+			if (isNaN(intValue)) {
+				setNewMovies((prev) => ({
+					...prev,
+					year: null,
+				}));
+				return toast.error("year should be number");
+			} else {
+				setNewMovies((prev) => ({
+					...prev,
+					year: intValue,
+				}));
+			}
+			return;
 		}
 		if (name === "genres") {
 			if (e.target.checked) {
@@ -76,9 +110,6 @@ const MoviesManager = React.memo(() => {
 				reader.onloadend = () => {
 					setImagePreviewUrl(reader.result);
 				};
-
-				setSelectedImage(file);
-				toast.success(selectedImage);
 			}
 		}
 
@@ -113,7 +144,7 @@ const MoviesManager = React.memo(() => {
 						value={newMovies.year}
 						onChange={handleChangeNewMovie}
 						name="year"
-						type="text"
+						type="number"
 						placeholder="year.."
 						inputMode="numeric"
 						className="input  input-bordered w-full max-w-xs "
@@ -199,7 +230,7 @@ const MoviesManager = React.memo(() => {
 								<button className="btn ">Edit</button>
 							</div>
 							<figure>
-								<img src={movie.image} alt="Movie" />
+								<img src={movie} alt="Movie" />
 							</figure>
 							<div className="card-body">
 								<h2 className="card-title">{movie.title}</h2>

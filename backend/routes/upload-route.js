@@ -51,5 +51,20 @@ router.post("/", (req, res) => {
     })
 })
 
+router.delete("/delete", (req, res) => {
+    const path = req.body
+    fs.unlink(path, (err) => {
+        if (err) {
+            // Handle specific error if any
+            if (err.code === 'ENOENT') {
+                console.error('File does not exist.');
+            } else {
+                throw err;
+            }
+        } else {
+            console.log('File deleted!');
+        }
+    })
+})
 
 export default router   

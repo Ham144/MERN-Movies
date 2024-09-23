@@ -15,6 +15,15 @@ export const uploadApiSlice = apiSlice.injectEndpoints({
                     "Content-Type": "multipart/form-data"
                 }
             })
+        }),
+        deleteImage: builder.mutation({
+            query: ({ path }) => ({
+                url: `${UPLOADS_URL}/delete`,
+                method: "DELETE",
+                body: path,
+            })
         })
     })
 })
+
+export const { useUploadImageMutation, useDeleteImageMutation } = uploadApiSlice
