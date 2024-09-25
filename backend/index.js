@@ -6,6 +6,7 @@ import userRoute from "./routes/user-route.js"
 import genreRoute from "./routes/genre-route.js"
 import movieRoute from "./routes/movie-route.js"
 import uploadRouter from "./routes/upload-route.js"
+import bodyParser from "body-parser"
 
 const app = express()
 const PORT = process.env.PORT || 4004
@@ -13,6 +14,8 @@ const PORT = process.env.PORT || 4004
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
 app.use(cookieParser())
+// app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));//new
+// app.use(bodyParser.json({ limit: '50mb', extended: true }));//new
 
 app.get("/", (req, res) => {
     res.send("Hello World!")

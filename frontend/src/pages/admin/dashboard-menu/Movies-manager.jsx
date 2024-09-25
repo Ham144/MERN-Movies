@@ -2,9 +2,14 @@ import React, { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import {
 	useCreateMovieMutation,
+	useDeleteMovieMutation,
 	useGetAllMoviesQuery,
 } from "../../../redux/api/movie";
 import { useGetAllGenreQuery } from "../../../redux/api/genre";
+import {
+	useDeleteImageMutation,
+	useUploadImageMutation,
+} from "../../../redux/api/upload";
 const MoviesManager = React.memo(() => {
 	//redux
 	const {
@@ -13,8 +18,14 @@ const MoviesManager = React.memo(() => {
 		refetch,
 	} = useGetAllMoviesQuery();
 	const { data: allGenres } = useGetAllGenreQuery();
-	const [createMovie, { isLoading: isLoadingCreateMovie }] =
+	const [createMovie, { isLoading: isLoadingCreateMovie, error: errorMovie }] =
 		useCreateMovieMutation();
+	const [
+		uploadImage,
+		{ isLoading: isLoadingUploadImg, error: uploadImgError },
+	] = useUploadImageMutation();
+	const [deleteMovie, { error: errorDeleteMovie }] = useDeleteMovieMutation();
+	const [deleteImage, { error: errorDeleteImage }] = useDeleteImageMutation();
 
 	//states for new movie
 	const [newMovies, setNewMovies] = useState({
@@ -28,11 +39,9 @@ const MoviesManager = React.memo(() => {
 	const [imagePreviewUrl, setImagePreviewUrl] = useState();
 	const [selectedImage, setSelectedImage] = useState();
 
-	//others
-	const readerImage = new FileReader();
-
 	async function handleCreateNewMovie(e) {
 		e.preventDefault();
+		let imagePathResult; //put result on this from uploadImage mutation
 
 		if (typeof newMovies.casts != "object") {
 			if (newMovies.casts.includes(",")) {
@@ -42,29 +51,72 @@ const MoviesManager = React.memo(() => {
 			}
 		}
 
-		console.log(selectedImage);
-		const formImage = new FormData();
-		formImage.append("image", selectedImage);
-
-		try {
-			newMovies.image = formImage;
-			const result = await createMovie(newMovies).unwrap();
-			console.log(result);
-			toast.success("movie created successfully");
-			refetch();
-		} catch (error) {
-			console.log(error);
-			return toast.error(error.data.errors);
+		if (typeof newMovies.year == "string") {
+			setNewMovies((prev) => ({
+				...prev,
+				year: parseInt(newMovies.year),
+			}));
 		}
 
-		// setNewMovies({
-		// 	title: "",
-		// 	description: "",
-		// 	genres: [],
-		// 	image: "",
-		// 	casts: [],
-		// 	year: "",
-		// });
+		try {
+			const formData = new FormData();
+			formData.append("image", selectedImage);
+
+			if (
+				!newMovies.title ||
+				!newMovies.casts ||
+				!newMovies.description ||
+				!newMovies.year
+			) {
+				return toast.error("all fields are required");
+			}
+
+			const uploadImgResult = await uploadImage(formData);
+
+			if (uploadImgResult.data) {
+				toast.success("image uploaded successfully");
+				imagePathResult = uploadImgResult.data;
+				console.log(imagePathResult);
+			} else if (uploadImgError) {
+				toast.error(uploadImgError.message);
+			}
+		} catch (error) {
+			toast.error(uploadImgError.message);
+			console.log(uploadImgError.message);
+			return toast.error(uploadImgError.message);
+		}
+
+		try {
+			if (!imagePathResult) {
+				return toast.warn("image not uploaded yet");
+			}
+			setNewMovies((prev) => ({
+				...prev,
+				image: imagePathResult?.data,
+			}));
+
+			// if (
+			// 	!newMovies.image ||
+			// 	newMovies.casts.length == 0 ||
+			// 	!newMovies.year ||
+			// 	!newMovies.description ||
+			// 	newMovies.genres.length == 0 ||
+			// 	!newMovies.title
+			// ) {
+			// 	return toast.error("all fields are required");
+			// }
+
+			const createResult = await createMovie(newMovies);
+			if (createResult.error) {
+				return toast.error(createResult.error);
+			}
+			refetch();
+			console.log(createResult);
+			toast.success("movie created successfully");
+		} catch (error) {
+			console.log(error);
+			toast.error(error.data.errors || errorMovie.message);
+		}
 	}
 
 	function handleChangeNewMovie(e) {
@@ -72,7 +124,7 @@ const MoviesManager = React.memo(() => {
 		const { name, value } = e.target;
 
 		if (name == "year") {
-			const intValue = 2000;
+			const intValue = parseInt(value);
 			if (isNaN(intValue)) {
 				setNewMovies((prev) => ({
 					...prev,
@@ -82,12 +134,10 @@ const MoviesManager = React.memo(() => {
 			} else {
 				setNewMovies((prev) => ({
 					...prev,
-					year: intValue,
+					year: +value,
 				}));
 			}
-			return;
-		}
-		if (name === "genres") {
+		} else if (name === "genres") {
 			if (e.target.checked) {
 				setNewMovies((prev) => ({
 					...prev,
@@ -100,9 +150,7 @@ const MoviesManager = React.memo(() => {
 				}));
 			}
 			return;
-		}
-
-		if (name == "image") {
+		} else if (name == "image") {
 			const file = e.target.files[0];
 			if (file) {
 				const reader = new FileReader();
@@ -110,14 +158,30 @@ const MoviesManager = React.memo(() => {
 				reader.onloadend = () => {
 					setImagePreviewUrl(reader.result);
 				};
+				setSelectedImage(file);
 			}
+			return;
+		} else {
+			return setNewMovies((prev) => ({
+				...prev,
+				[name]: value,
+			}));
 		}
+	}
 
-		setNewMovies((prev) => ({
-			...prev,
-			[name]: value,
-		}));
-		// createMovie(newMovies);
+	function handleDeleteMovie(id, path) {
+		if (!id || !path) {
+			return toast.error("something went wrong");
+		}
+		deleteMovie({ id })
+			.then(async () => {
+				await deleteImage(JSON.stringify({ path }));
+			})
+			.then(() => {
+				toast.success("deleted successfully");
+				refetch();
+			})
+			.catch((err) => toast.error("failed to delete : ", err.data.errors));
 	}
 
 	return (
@@ -204,7 +268,7 @@ const MoviesManager = React.memo(() => {
 				/>
 
 				<div className={`w-full max-w-xs`}>
-					{newMovies.image && (
+					{imagePreviewUrl && (
 						<img
 							src={imagePreviewUrl}
 							alt="image"
@@ -226,11 +290,16 @@ const MoviesManager = React.memo(() => {
 					movies?.data?.map((movie) => (
 						<div className="card card-side bg-base-100 shadow-xl lg:mt-5 mt-3">
 							<div className={`button absolute flex w-full justify-between`}>
-								<button className="btn bg-red-400 px-3">Delete</button>
+								<button
+									className="btn bg-red-400 px-3"
+									onClick={() => handleDeleteMovie(movie.id, movie.image)}
+								>
+									Delete
+								</button>
 								<button className="btn ">Edit</button>
 							</div>
 							<figure>
-								<img src={movie} alt="Movie" />
+								<img src={movie.image} alt="Movie" />
 							</figure>
 							<div className="card-body">
 								<h2 className="card-title">{movie.title}</h2>

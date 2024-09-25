@@ -2,6 +2,7 @@
 
 import express from "express";
 import multer from "multer";
+import fs from "fs"
 import path from "path"
 
 const router = express.Router()
@@ -52,7 +53,7 @@ router.post("/", (req, res) => {
 })
 
 router.delete("/delete", (req, res) => {
-    const path = req.body
+    const path = req.body.path
     fs.unlink(path, (err) => {
         if (err) {
             // Handle specific error if any
@@ -62,7 +63,8 @@ router.delete("/delete", (req, res) => {
                 throw err;
             }
         } else {
-            console.log('File deleted!');
+            console.log('File IMAGE deleted!');
+            res.json({ data: "image deleted" })
         }
     })
 })

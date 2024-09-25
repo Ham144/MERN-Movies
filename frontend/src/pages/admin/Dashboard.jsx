@@ -15,17 +15,11 @@ import { useGetAllUsersQuery } from "../../redux/api/user";
 import { toast } from "react-toastify";
 import { useGetAllGenreQuery } from "../../redux/api/genre";
 import MoviesManager from "./dashboard-menu/Movies-manager";
+import UsersManager from "./dashboard-menu/UserManager";
 
 const Dashboard = () => {
 	//redux
 	const { data: movies, isLoading: isLoadingMovies } = useGetAllMoviesQuery();
-	const [createMovie, { isLoading: isLoadingCreateMovie }] =
-		useCreateMovieMutation();
-	const [editMovie, { isLoading: isLoadingEditMovie }] = useEditMovieMutation();
-	const [deleteMovie, { isLoading: isLoadingDeleteMovie }] =
-		useDeleteMovieMutation();
-	const [deleteReview, { isLoading: isLoadingDeleteReview }] =
-		useDeleteReviewMutation();
 	const { data: allReviews, isLoading: isLoadingAllReviews } =
 		useGetAllReviewsQuery({});
 	const { data: allUsers, isLoading: isLoadingAllUsers } = useGetAllUsersQuery(
@@ -33,20 +27,15 @@ const Dashboard = () => {
 	);
 	const { data: allGenres } = useGetAllGenreQuery();
 	//current dashboard component to show
-	const [currentCompoenent, setCurrentComponent] = useState("movies-manager"); //default: my-dashboard
+	const [currentCompoenent, setCurrentComponent] = useState("users-manager"); //default: my-dashboard
 
-	if (
-		isLoadingMovies ||
-		isLoadingCreateMovie ||
-		isLoadingEditMovie ||
-		isLoadingDeleteMovie ||
-		isLoadingDeleteReview
-	)
+	if (isLoadingMovies) {
 		return (
 			<div>
 				<span className="loading loading-spinner loading-lg"></span>
 			</div>
 		);
+	}
 
 	function MyDashboard() {
 		return (
@@ -99,41 +88,6 @@ const Dashboard = () => {
 						</button>
 					</div>
 				</div>
-			</div>
-		);
-	}
-
-	function UsersManager() {
-		return (
-			<div className={`flex flex-col justify-center  max-md:w-full `}>
-				{!isLoadingAllUsers ? (
-					allUsers.data.map((user) => (
-						<div className="card w-96 bg-base-100 shadow-xl ">
-							<div className="card-body font-bold font-serif relative">
-								<h2 className="card-title items-center">
-									{user.username} ~ <span className="badge">{user.name}</span>
-								</h2>
-
-								<p>Email: {user.email}</p>
-								<p>Role: {user?.isAdmin}</p>
-								<div className={`absolute left-3 bottom-3`}></div>
-								<div className="card-actions justify-between mt-4 items-center ">
-									<div>
-										{user.admin ? (
-											<p className="text-red-500">Admin</p>
-										) : (
-											<p className="text-green-500">User</p>
-										)}
-									</div>
-									<button className="btn btn-primary">Edit</button>
-									<button className="btn bg-red-400">Delete</button>
-								</div>
-							</div>
-						</div>
-					))
-				) : (
-					<span className="loading loading-spinner loading-lg"></span>
-				)}
 			</div>
 		);
 	}

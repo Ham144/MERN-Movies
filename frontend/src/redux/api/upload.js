@@ -7,20 +7,17 @@ const baseQuery = fetchBaseQuery({ baseUrl: UPLOADS_URL })
 export const uploadApiSlice = apiSlice.injectEndpoints({
     endpoints: (builder) => ({
         uploadImage: builder.mutation({
-            query: (data) => ({
+            query: (formData) => ({
                 url: `${UPLOADS_URL}`,
                 method: "POST",
-                body: data,
-                headers: {
-                    "Content-Type": "multipart/form-data"
-                }
+                body: formData,
             })
         }),
         deleteImage: builder.mutation({
-            query: ({ path }) => ({
+            query: (path) => ({
                 url: `${UPLOADS_URL}/delete`,
                 method: "DELETE",
-                body: path,
+                body: path
             })
         })
     })
