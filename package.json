@@ -7,7 +7,9 @@
 	"scripts": {
 		"fe": "cd frontend && npm run dev",
 		"be": "nodemon backend/index.js",
-		"full": "concurrently  \"npm run fe\" \"npm run be\""
+		"full": "concurrently  \"npm run fe\" \"npm run be\"",
+		"build": "npm --prefix frontend run build",
+		"start": "npm --prefix backend run start"
 	},
 	"jest": {
 		"transform": {
