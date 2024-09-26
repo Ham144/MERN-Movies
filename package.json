@@ -8,7 +8,7 @@
 		"fe": "cd frontend && npm run dev",
 		"be": "nodemon backend/index.js",
 		"full": "concurrently  \"npm run fe\" \"npm run be\"",
-		"build": "npm i --prefix ./frontend && npm run build --prefix ./frontend && npm run install",
+		"build": "npm install --prefix ./frontend && npm run build --prefix ./frontend && npm run install",
 		"start": "npm --prefix backend run start"
 	},
 	"jest": {
