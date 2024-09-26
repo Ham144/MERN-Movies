@@ -32,7 +32,7 @@ function UsersManager() {
 				toast.success("deleted successfully");
 				refetch();
 			})
-			.catch((err) => toast.error("failed to delete : ", err.data.errors));
+			.catch((err) => toast.error("failed to delete : ", err?.data.errors));
 	}
 
 	async function handleUpdateUser(e, username) {
@@ -45,13 +45,13 @@ function UsersManager() {
 				toast.success("updated successfully");
 				refetch();
 			})
-			.catch((err) => toast.error("failed to update : ", err.data.errors));
+			.catch((err) => toast.error("failed to update : ", err?.data.errors));
 	}
 
 	return (
 		<div className={`flex flex-col justify-center  max-md:w-full `}>
 			{!isLoadingAllUsers ? (
-				allUsers.data.map((user) => (
+				allUsers?.data?.map((user) => (
 					<div className="card w-96 bg-base-100 shadow-xl ">
 						<div className="card-body font-bold font-serif relative">
 							<h2 className="card-title items-center">
@@ -66,7 +66,7 @@ function UsersManager() {
 									{user.isAdmin == "ADMIN" ? (
 										<p className="text-red-500">Admin</p>
 									) : (
-										<p className="text-green-500">User</p>
+										<p className="text-green-500">Reguler</p>
 									)}
 								</div>
 								<button

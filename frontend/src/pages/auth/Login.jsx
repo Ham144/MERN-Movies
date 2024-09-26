@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import { useLoginMutation } from "../../redux/api/user";
 import { useDispatch, useSelector } from "react-redux";
 import { setCredentials } from "../../redux/features/auth/authSlice";
-import { useNavigate } from "react-router";
+import { Navigate, useNavigate } from "react-router";
 
 const Login = () => {
 	//required filed for login
@@ -72,6 +72,12 @@ const Login = () => {
 							<MdLogin />
 						</div>
 					</button>
+				</div>
+				<div
+					onClick={() => navigate("/register")}
+					className="badge badge-secondary cursor-pointer p-3 hover:bg-slate-300"
+				>
+					Register here
 				</div>
 			</form>
 		</>

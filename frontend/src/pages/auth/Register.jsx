@@ -134,6 +134,12 @@ const Register = () => {
 						</div>
 					</button>
 				</div>
+				<div
+					onClick={() => navigate("/login")}
+					className="badge badge-secondary cursor-pointer p-3 hover:bg-slate-300"
+				>
+					Login here
+				</div>
 			</form>
 		</>
 	);
