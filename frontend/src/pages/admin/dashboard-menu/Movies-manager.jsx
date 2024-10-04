@@ -10,6 +10,8 @@ import {
 	useDeleteImageMutation,
 	useUploadImageMutation,
 } from "../../../redux/api/upload";
+import { MdStar } from "react-icons/md";
+
 const MoviesManager = React.memo(() => {
 	//redux
 	const {
@@ -37,11 +39,9 @@ const MoviesManager = React.memo(() => {
 		year: undefined,
 	});
 	const [imagePreviewUrl, setImagePreviewUrl] = useState();
-	const [selectedImage, setSelectedImage] = useState();
 
 	async function handleCreateNewMovie(e) {
 		e.preventDefault();
-		let imagePathResult; //put result on this from uploadImage mutation
 
 		if (typeof newMovies.casts != "object") {
 			if (newMovies.casts.includes(",")) {
@@ -59,9 +59,6 @@ const MoviesManager = React.memo(() => {
 		}
 
 		try {
-			const formData = new FormData();
-			formData.append("image", selectedImage);
-
 			if (
 				!newMovies.title ||
 				!newMovies.casts ||
@@ -70,56 +67,39 @@ const MoviesManager = React.memo(() => {
 			) {
 				return toast.error("all fields are required");
 			}
-
-			const uploadImgResult = await uploadImage(formData);
-
-			if (uploadImgResult.data) {
-				toast.success("image uploaded successfully");
-				imagePathResult = uploadImgResult.data;
-				console.log(imagePathResult);
-			} else if (uploadImgError) {
-				toast.error(uploadImgError.message);
+			if (!newMovies.genres) {
+				return toast.error("genre is required");
 			}
-		} catch (error) {
-			toast.error(uploadImgError.message);
-			console.log(uploadImgError.message);
-			return toast.error(uploadImgError.message);
-		}
 
-		try {
-			if (!imagePathResult) {
-				return toast.warn("image not uploaded yet");
+			if (!newMovies.image) {
+				return toast.warn("image is required");
 			}
-			setNewMovies((prev) => ({
-				...prev,
-				image: imagePathResult?.data,
-			}));
 
-			// if (
-			// 	!newMovies.image ||
-			// 	newMovies.casts.length == 0 ||
-			// 	!newMovies.year ||
-			// 	!newMovies.description ||
-			// 	newMovies.genres.length == 0 ||
-			// 	!newMovies.title
-			// ) {
-			// 	return toast.error("all fields are required");
-			// }
+			if (
+				!newMovies.image ||
+				!newMovies.casts.length ||
+				!newMovies.year ||
+				!newMovies.description ||
+				!newMovies.genres.length ||
+				!newMovies.title
+			) {
+				return toast.error("all fields are required");
+			}
 
 			const createResult = await createMovie(newMovies);
 			if (createResult.error) {
-				return toast.error(createResult.error);
+				return toast.error(createResult.error || createResult.message);
 			}
 			refetch();
 			console.log(createResult);
 			toast.success("movie created successfully");
 		} catch (error) {
-			console.log(error);
-			toast.error(error.data.errors || errorMovie.message);
+			console.log(uploadImgError.message);
+			return toast.error(uploadImgError.message);
 		}
 	}
 
-	function handleChangeNewMovie(e) {
+	async function handleChangeNewMovie(e) {
 		e.preventDefault();
 		const { name, value } = e.target;
 
@@ -158,9 +138,24 @@ const MoviesManager = React.memo(() => {
 				reader.onloadend = () => {
 					setImagePreviewUrl(reader.result);
 				};
-				setSelectedImage(file);
 			}
-			return;
+
+			try {
+				const formData = new FormData();
+				formData.append("image", file);
+
+				const uploadImgResult = await uploadImage(formData);
+				if (uploadImgResult.data) {
+					setNewMovies((prev) => ({
+						...prev,
+						image: uploadImgResult.data.data,
+					}));
+					toast.success("image is ready!");
+				}
+			} catch (error) {
+				console.log(error);
+				toast.error(error.message);
+			}
 		} else {
 			return setNewMovies((prev) => ({
 				...prev,
@@ -184,11 +179,24 @@ const MoviesManager = React.memo(() => {
 			.catch((err) => toast.error("failed to delete : ", err.data.errors));
 	}
 
+	function GenerateStars() {
+		return (
+			<>
+				<MdStar />
+				<MdStar />
+				<MdStar />
+				<MdStar />
+			</>
+		);
+	}
+
 	return (
-		<div className={`flex max-md:flex-col  gap-y-4 `}>
+		<div
+			className={`flex max-md:flex-col   gap-y-4 min-h-screen overflow-y-scroll  pb-20`}
+		>
 			<form
 				onSubmit={handleCreateNewMovie}
-				className={`flex flex-col items-center w-96 mx-auto  justify-center mt-5 p-3 border rounded-md glass `}
+				className={`flex flex-col items-center p-4 mx-auto  justify-center mt-5  border rounded-md glass `}
 			>
 				<label className="w-full block ">
 					<p>Title</p>
@@ -230,10 +238,10 @@ const MoviesManager = React.memo(() => {
 				<label className="w-full text-start block">
 					<p>Genres</p>
 
-					<div className={`flex mx-auto gap-x-2 justify-start`}>
+					<div className={`grid grid-cols-3 self-center   justify-center  `}>
 						{allGenres &&
 							allGenres.data.map((genre) => (
-								<>
+								<div className="block text-center py-3 hover:glass rounded-sm">
 									<input
 										type="checkbox"
 										name="genres"
@@ -242,7 +250,7 @@ const MoviesManager = React.memo(() => {
 										className="checkbox"
 									/>
 									<p>{genre.name}</p>
-								</>
+								</div>
 							))}
 					</div>
 				</label>
@@ -265,6 +273,7 @@ const MoviesManager = React.memo(() => {
 					name="image"
 					onChange={handleChangeNewMovie}
 					placeholder="image"
+					className="py-3"
 				/>
 
 				<div className={`w-full max-w-xs`}>
@@ -280,7 +289,17 @@ const MoviesManager = React.memo(() => {
 				{/* ========= */}
 				<button
 					type="submit"
-					className={`btn btn-neutral ${isLoadingCreateMovie && "loading"}`}
+					disabled={
+						isLoadingCreateMovie ||
+						isLoadingUploadImg ||
+						!newMovies.image ||
+						!newMovies.genres.length > 0 ||
+						!newMovies.title ||
+						!newMovies.description
+					}
+					className={`btn btn-neutral mt-2 ${
+						isLoadingCreateMovie && "loading"
+					}`}
 				>
 					Create
 				</button>
@@ -288,10 +307,12 @@ const MoviesManager = React.memo(() => {
 			<div className="flex flex-col">
 				{movies ? (
 					movies?.data?.map((movie) => (
-						<div className="card card-side bg-base-100 shadow-xl lg:mt-5 mt-3">
-							<div className={`button absolute flex w-full justify-between`}>
+						<div className="card card-side bg-base-100 shadow-xl lg:mt-5 mt-3 rounded-l-lg max-md:flex max-md:flex-col ">
+							<div
+								className={`button absolute md:flex w-full block z-10 justify-end  gap-x-3 p-3`}
+							>
 								<button
-									className="btn bg-red-400 px-3"
+									className="btn border-red-300 bg-transparent hover:bg-red-300 px-3 max-md:mr-3"
 									onClick={() => handleDeleteMovie(movie.id, movie.image)}
 								>
 									Delete
@@ -299,10 +320,21 @@ const MoviesManager = React.memo(() => {
 								<button className="btn ">Edit</button>
 							</div>
 							<figure>
-								<img src={movie.image} alt="Movie" />
+								<img src={movie.image} alt="Movie" className="w-96" />
 							</figure>
 							<div className="card-body">
-								<h2 className="card-title">{movie.title}</h2>
+								<div className="flex flex-col self-start  gap-x-4  gap-y-2 w-full">
+									<h2 className="card-title ">
+										{movie.title[0].toUpperCase() + movie.title.slice(1)}
+									</h2>
+									<span
+										className={` flex items-center gap-x-3 badge-primary  p-2 rounded-md  `}
+									>
+										{movie.year}
+										<GenerateStars />
+									</span>
+								</div>
+
 								<p>{movie.description}</p>
 								{/* //genres */}
 								<span className={`flex gap-x-3`}>
@@ -316,14 +348,15 @@ const MoviesManager = React.memo(() => {
 										<div className="badge badge-primary">{cast}</div>
 									))}
 								</span>
-								<div className="card-actions justify-end">
+								<div className="card-actions justify-end max-md:absolute right-3">
 									<button className="btn btn-primary">Watch</button>
 								</div>
 								<div className="meta-data lg:pt-9 pt-4 text-white">
-									<span className={`badge`}>{movie.year}</span>
-									<span className={`badge`}>upload: {movie.uploadAt}</span>
 									<span className={`badge`}>
-										latest updated: {movie.updatedAt}
+										Upload : {new Date(movie.uploadAt).toDateString()}
+									</span>
+									<span className={`badge`}>
+										latest updated: {new Date(movie.updatedAt).toDateString()}
 									</span>
 									<span className={`badge`}>
 										Revies count: {movie?.reviews?.length || 0}

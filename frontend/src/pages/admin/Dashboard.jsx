@@ -27,7 +27,7 @@ const Dashboard = () => {
 	);
 	const { data: allGenres } = useGetAllGenreQuery();
 	//current dashboard component to show
-	const [currentCompoenent, setCurrentComponent] = useState("users-manager"); //default: my-dashboard
+	const [currentCompoenent, setCurrentComponent] = useState("movies-manager"); //default: my-dashboard
 
 	if (isLoadingMovies) {
 		return (

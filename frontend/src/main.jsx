@@ -28,7 +28,7 @@ const router = createBrowserRouter(
 			<Route path="/register" element={<Register />} />
 
 			<Route path="" element={<PrivateRouteWrapper />}>
-				//private pages
+				//private pages for authenticated only
 				<Route path="/profile" element={<Profile />} />
 			</Route>
 
