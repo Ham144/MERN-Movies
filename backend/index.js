@@ -41,9 +41,9 @@ const __dirname = path.resolve()
 app.use("/uploads", express.static(path.join(__dirname + "/uploads")))
 
 //menampilkan frontend yang sudah di build, kalau edit fe harus rebuild
-app.use(express.static(path.join(__dirname, "/frontend/dist")))
+app.use(express.static(path.join(__dirname, "/frontend/dist")))//untuk home
 app.get("*", (req, res) => {
-    res.sendFile(path.resolve(__dirname, "../MERN Movies/frontend/dist", "index.html"))
+    res.sendFile(path.resolve(__dirname, "../MERN Movies/frontend/dist", "index.html"))//untuk lain
 })
 
 //exported for testing only
