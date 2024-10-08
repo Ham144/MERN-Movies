@@ -5,7 +5,7 @@ import { MdMenu } from "react-icons/md";
 const Menu = () => {
 	return (
 		<div className="w-full h-full relative">
-			<div className="dropdown fixed right-5 bottom-20 animate-pulse ">
+			<div className="dropdown fixed right-5 bottom-20  ">
 				<label tabIndex={0} className="btn m-1 ">
 					<MdMenu className={`lg:size-11 size-5`} />
 				</label>

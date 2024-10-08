@@ -231,7 +231,7 @@ export const latestMovies = async (req, res) => {
         })
         return res.json({ data: result })
     } catch (error) {
-        return eas.status(400).json({ errors: error.message })
+        return res.status(400).json({ errors: error.message })
     }
 }
 

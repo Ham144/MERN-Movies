@@ -6,7 +6,7 @@ import userRoute from "./routes/user-route.js"
 import genreRoute from "./routes/genre-route.js"
 import movieRoute from "./routes/movie-route.js"
 import uploadRouter from "./routes/upload-route.js"
-
+import cors from "cors"
 
 
 const app = express()
@@ -27,6 +27,11 @@ app.listen(PORT, () => {
     console.log("success running on " + PORT)
 })
 
+const __dirname = path.resolve()
+app.use("/uploads", express.static(path.join(__dirname + "/uploads")))
+
+app.use(cors({ credentials: true, origin: "mern-movies-production.up.railway.app" }))
+
 
 //routes
 app.use("/api/users", userRoute)
@@ -34,8 +39,7 @@ app.use("/api/genres", genreRoute)
 app.use("/api/movies", movieRoute)
 app.use("/api/uploads", uploadRouter)
 
-const __dirname = path.resolve()
-app.use("/uploads", express.static(path.join(__dirname + "/uploads")))
+
 
 //menampilkan frontend yang sudah di build, kalau edit fe harus rebuild
 app.use(express.static(path.join(__dirname, "/frontend/dist")))
