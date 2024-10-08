@@ -8,8 +8,8 @@
 		"fe": "cd frontend && npm run dev",
 		"be": "nodemon backend/index.js",
 		"full": "concurrently  \"npm run fe\" \"npm run be\"",
-		"build": "npm install --omit=dev --prefix ./frontend && npm run build --prefix ./frontend && npm run install",
-		"start": "npm --prefix backend run start"
+		"build": "npm install --prefix ./frontend && npm run build --prefix ./frontend ",
+		"start": "node ./backend/index.js"
 	},
 	"jest": {
 		"transform": {

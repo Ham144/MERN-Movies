@@ -6,15 +6,12 @@ import userRoute from "./routes/user-route.js"
 import genreRoute from "./routes/genre-route.js"
 import movieRoute from "./routes/movie-route.js"
 import uploadRouter from "./routes/upload-route.js"
-import { fileURLToPath } from "url"
 
 
 
 const app = express()
-const PORT = process.env.PORT || 4004
+const PORT = process.env.PORT || 3001;
 
-//resolve path
-const __filename = fileURLToPath(import.meta.url)
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
@@ -41,10 +38,10 @@ const __dirname = path.resolve()
 app.use("/uploads", express.static(path.join(__dirname + "/uploads")))
 
 //menampilkan frontend yang sudah di build, kalau edit fe harus rebuild
-// app.use(express.static(path.join(__dirname, "/frontend/dist")))
-// app.get("*", (req, res) => {
-//     res.sendFile(path.resolve(__dirname, "/frontend/dist/index.html"))
-// })
+app.use(express.static(path.join(__dirname, "/frontend/dist")))
+app.get("*", (req, res) => {
+    res.sendFile(path.resolve(__dirname, "/frontend/dist/index.html"))
+})
 
 //exported for testing only
 export {
