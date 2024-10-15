@@ -43,13 +43,7 @@ app.use("/uploads", express.static(path.join(__dirname + "/uploads")))
 //menampilkan frontend yang sudah di build, kalau edit fe harus rebuild
 app.use(express.static(path.join(__dirname, "/frontend/dist")))//untuk home
 app.get("*", (req, res) => {
-    if (process.env.NODE_ENV === "development") {
-        res.sendFile(path.resolve(__dirname, "../MERN Movies/frontend/dist", "index.html"))//untuk lain
-    }
-    else {
-        console.log(path.resolve(__dirname, "../MERN Movies/frontend/dist", "index.html").toString())
-        res.send(path.resolve(__dirname, "../MERN Movies/frontend/dist", "index.html").toString())
-    }
+    res.sendFile(path.resolve(__dirname, "../MERN Movies/frontend/dist", "index.html"))//untuk lain
 })
 
 //exported for testing only
