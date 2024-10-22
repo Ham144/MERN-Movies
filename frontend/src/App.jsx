@@ -7,7 +7,7 @@ import Menu from "./pages/Menu";
 
 const App = () => {
 	return (
-		<div className={`font-sans mx-auto px-5 h-full`}>
+		<div className={`font-sans mx-auto  h-full`}>
 			<ToastContainer />
 			<main>
 				<Outlet />
