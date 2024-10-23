@@ -105,9 +105,6 @@ const loginUser = asyncHandler(async (req, res) => {
 const logoutUser = asyncHandler(async (req, res) => {
 
     try {
-        if (req.cookies.jwt == undefined) {
-            throw new Error("You are not logged in")
-        }
         res.cookie("jwt", "", {
             httpOnly: true,
             expires: new Date(0)

@@ -2,7 +2,6 @@ import React from "react";
 import { useGetAllMoviesQuery } from "../redux/api/movie";
 import { MdFilterList } from "react-icons/md";
 import { useGetAllGenreQuery } from "../redux/api/genre";
-import { array } from "joi";
 
 const Movies = () => {
 	//redux
