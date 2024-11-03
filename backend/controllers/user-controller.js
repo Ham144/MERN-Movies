@@ -20,7 +20,7 @@ const createUser = asyncHandler(async (req, res) => {
             email: email
         }
     })
-    if (userExist) return res.status(403).json({ errors: "username or email exist" })
+    if (userExist || emailExist) return res.status(403).json({ errors: "username or email exist" })
 
     //hasing
     body.password = bcrypt.hashSync(password, 10)
@@ -32,7 +32,7 @@ const createUser = asyncHandler(async (req, res) => {
                 username: true,
                 name: true,
                 email: true,
-                isAdmin: true,
+                isAdmin: false,
                 phone: true
             }
         })
@@ -105,11 +105,12 @@ const loginUser = asyncHandler(async (req, res) => {
 const logoutUser = asyncHandler(async (req, res) => {
 
     try {
-        res.cookie("jwt", "", {
-            httpOnly: true,
-            expires: new Date(0)
-        })
-        return res.status(200).end()
+        // console.log(req.signedCookie['jwt'])
+        //perlu tambahan untuk hapus cookie res.clearCookie("jwt")
+        const token = req.signedCookies['jwt'];
+        if (token) { console.log("token ini berikut berhasil dihapus : " + token) }
+        else { return res.status(401).json({ success: false, message: "gagal logout" }) }
+        return res.clearCookie("jwt").status(200).end()
     } catch (error) {
         return res.status(401).json({
             errors: error.message

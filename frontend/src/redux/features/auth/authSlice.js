@@ -2,7 +2,7 @@ import { createSlice } from "@reduxjs/toolkit";
 
 
 const initialState = {
-    userInfo: localStorage.getItem("userInfo") ? JSON.parse(localStorage.getItem("userInfo")) : null
+    userInfo: localStorage.getItem("jwt_localstorage") ? JSON.parse(localStorage.getItem("jwt_localstorage")) : null
 }
 
 
@@ -12,14 +12,15 @@ const authSlice = createSlice({
     reducers: {
         setCredentials(state, action) {
             state.userInfo = action.payload
-            localStorage.setItem("userInfo", JSON.stringify(action.payload))
+            localStorage.setItem("jwt_localstorage", JSON.stringify(action.payload))
 
-            const expired = new Date().getTime() * 30 * 24 * 60 * 60 * 1000
+            const expired = new Date().getTime() * 7 * 24 * 60 * 60 * 1000
             localStorage.setItem("expired", expired)
         },
         logout(state) {
             state.userInfo = null;
-            localStorage.clear("userInfo");
+            localStorage.clear("jwt_localstorage");
+            window.location.reload()
         }
     },
 })

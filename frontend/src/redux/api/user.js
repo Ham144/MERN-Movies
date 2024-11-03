@@ -13,7 +13,8 @@ export const userApiSlice = apiSlice.injectEndpoints({
             query: (data) => ({
                 url: `${USERS_URL}/auth`,
                 method: "POST",
-                body: data
+                body: data,
+                credentials: "include"
             })
         }),
         register: builder.mutation({
@@ -27,23 +28,27 @@ export const userApiSlice = apiSlice.injectEndpoints({
             query: () => ({
                 url: `${USERS_URL}/logout`,
                 method: "DELETE",
+                credentials: "include"
             })
         }),
         profile: builder.mutation({
             query: (data) => ({
                 url: `${USERS_URL}/update/${data.username}`,
                 method: "PATCH",
-                body: data
+                body: data,
+                credentials: "include"
             })
         }),
         getAllUsers: builder.query({
             query: () => ({
-                url: `${USERS_URL}`
+                url: `${USERS_URL}`,
+                credentials: "include"
             })
         }),
         deleteUser: builder.mutation({
             query: ({ username }) => ({
-                url: `${USERS_URL}/delete/${username}`
+                url: `${USERS_URL}/delete/${username}`,
+                credentials: "include"
             })
         })
     })

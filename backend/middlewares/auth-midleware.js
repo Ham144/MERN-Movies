@@ -8,7 +8,8 @@ const authenticate = asyncHandler(async (req, res, next) => {
     let token;
 
     //read jwt from cookies
-    token = req.cookies.jwt
+    token = req.signedCookies['jwt'] //cookie yg terdapat signed: true saat res.cookie({signed: true})
+    // token = req.cookies['jwt'] //cookie normal
 
     if (token) {
         try {

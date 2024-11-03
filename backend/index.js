@@ -13,22 +13,17 @@ const app = express()
 const PORT = process.env.PORT || 3001;
 
 
-app.use(express.json())
-app.use(express.urlencoded({ extended: true }))
-app.use(cookieParser())
-// app.use(bodyParser.urlencoded({ limit: '50mb', extended: true }));//new
-// app.use(bodyParser.json({ limit: '50mb', extended: true }));//new
+app.use(express.json()) //parsing segalanya auto jadi json
+app.use(express.urlencoded({ extended: true })) //aga bisa membaca action form(ga penting kali ini)
+app.use(cookieParser(process.env.JWT_SIGNATURE)) //buat jwt jadi signedCookies(cookie yg perlu signature)
+app.use(cors({ origin: "http://localhost:5173", credentials: true })) //credentials true buat fe jadi auto kirim cookie untuk diperiksa, origin untuk mengizinkan fe, * untuk bebas origin
 
-// app.get("/", (req, res) => {
-//     res.send("Hello World!")
-// })
 
 app.listen(PORT, () => {
     console.log("success running on " + PORT)
 })
 
 
-app.use(cors())
 
 //routes
 app.use("/api/users", userRoute)
@@ -45,8 +40,3 @@ app.use(express.static(path.join(__dirname, "/frontend/dist")))//untuk home
 app.get("*", (req, res) => {
     res.sendFile(path.resolve(__dirname, "../MERN Movies/frontend/dist", "index.html"))//untuk lain
 })
-
-//exported for testing only
-export {
-    app
-}

@@ -8,7 +8,7 @@ const router = express.Router();
 
 router.post("/", createUser).get(authenticate, authorizeIsAdmin, getAllUser)
 router.post("/auth", loginUser)
-router.delete("/logout", logoutUser)
+router.delete("/logout", authenticate, logoutUser)
 router.get("/", authenticate, authorizeIsAdmin, getAllUser) //belum digunakan
 router.get("/:username", authenticate, getSingleUser) //belum digunakan
 router.get("/current/user", authenticate, getCurrentUser)
