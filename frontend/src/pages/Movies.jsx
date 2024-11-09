@@ -1,7 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
 import { useGetAllMoviesQuery } from "../redux/api/movie";
 import { MdFilterList } from "react-icons/md";
 import { useGetAllGenreQuery } from "../redux/api/genre";
+import axios from "axios";
+import { RAPID_API_MOVIES_KEY } from "../../env";
 
 const Movies = () => {
 	//redux
@@ -9,9 +11,37 @@ const Movies = () => {
 		useGetAllMoviesQuery();
 	const { data: allGenres } = useGetAllGenreQuery();
 
+	//states untuk movies page
+	const [searchText, setSearchText] = useState("");
+
+	async function handleSearch(e) {
+		e.preventDefault();
+		import axios from "axios";
+
+		const options = {
+			method: "GET",
+			url: "https://moviesdatabase.p.rapidapi.com/titles/search/title/%7Btitle%7D",
+			params: {
+				exact: "true",
+				titleType: "movie",
+			},
+			headers: {
+				"x-rapidapi-key": RAPID_API_MOVIES_KEY,
+				"x-rapidapi-host": "moviesdatabase.p.rapidapi.com",
+			},
+		};
+
+		try {
+			const response = await axios.request(options);
+			console.log(response.data);
+		} catch (error) {
+			console.error(error);
+		}
+	}
+
 	return (
 		<div className="flex flex-col  gap-y-6 mt-4 w-full ">
-			<div className="flex  gap-3 ">
+			<form onSubmit={handleSearch} className="flex  gap-3 ">
 				<div className="drawer z-20 flex md:w-[5%]">
 					<input id="my-drawer" type="checkbox" className="drawer-toggle" />
 					<div className="drawer-content ">
@@ -75,11 +105,15 @@ const Movies = () => {
 					</div>
 				</div>
 				<input
-					type="text"
 					placeholder="Search movie name.."
 					className="input border border-spacing-2 glass font-bold text-white md:w-full  "
+					value={searchText}
+					onChange={(e) => setSearchText(e.target.value)}
 				/>
-			</div>
+				<button type="submit" onClick={handleSearch}>
+					Search
+				</button>
+			</form>
 
 			<div className="flex flex-col gap-3 overflow-y-scroll mb-12 ">
 				{isLoadingAllMovies ? (
